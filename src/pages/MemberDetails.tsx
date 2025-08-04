@@ -9,6 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PaymentOverview } from "@/components/payments/PaymentOverview";
+import { PaymentHistory } from "@/components/payments/PaymentHistory";
+import { ArchivedPayments } from "@/components/payments/ArchivedPayments";
+import { PaymentForm } from "@/components/payments/PaymentForm";
 
 export default function MemberDetails() {
   const { policyNo } = useParams();
@@ -16,6 +20,7 @@ export default function MemberDetails() {
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const [confirmPromoteOpen, setConfirmPromoteOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [paymentFormOpen, setPaymentFormOpen] = useState(false);
 
   // Mock member data - in real app this would come from API
   const member = {
@@ -171,13 +176,31 @@ export default function MemberDetails() {
         </TabsContent>
 
         <TabsContent value="payments">
-          <Card>
-            <CardContent className="p-6">
-              <div className="text-center text-muted-foreground">
-                No payment data available for this member.
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="pay" onClick={() => setPaymentFormOpen(true)}>
+                Pay
+              </TabsTrigger>
+              <TabsTrigger value="archived">
+                Archived
+                <Badge variant="destructive" className="ml-2">8</Badge>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview">
+              <PaymentOverview memberData={{ policyNumber: member.policyNumber, name: member.name }} />
+            </TabsContent>
+
+            <TabsContent value="history">
+              <PaymentHistory />
+            </TabsContent>
+
+            <TabsContent value="archived">
+              <ArchivedPayments userRole="admin" />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="dependents">
@@ -287,6 +310,13 @@ export default function MemberDetails() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Payment Form Modal */}
+      <PaymentForm 
+        isOpen={paymentFormOpen} 
+        onClose={() => setPaymentFormOpen(false)}
+        memberData={{ policyNumber: member.policyNumber, name: member.name }}
+      />
     </div>
   );
 }
