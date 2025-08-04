@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					hover: 'hsl(var(--primary-hover))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -61,6 +62,30 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				status: {
+					active: 'hsl(var(--status-active))',
+					'active-foreground': 'hsl(var(--status-active-foreground))',
+					waiting: 'hsl(var(--status-waiting))',
+					'waiting-foreground': 'hsl(var(--status-waiting-foreground))',
+					inactive: 'hsl(var(--status-inactive))',
+					'inactive-foreground': 'hsl(var(--status-inactive-foreground))'
+				},
+				chart: {
+					'1': 'hsl(var(--chart-1))',
+					'2': 'hsl(var(--chart-2))',
+					'3': 'hsl(var(--chart-3))',
+					'4': 'hsl(var(--chart-4))'
+				},
+				header: {
+					DEFAULT: 'hsl(var(--header-background))',
+					foreground: 'hsl(var(--header-foreground))'
+				},
+				activity: {
+					members: 'hsl(var(--card-members))',
+					dependents: 'hsl(var(--card-dependents))',
+					plans: 'hsl(var(--card-plans))',
+					revenue: 'hsl(var(--card-revenue))'
 				}
 			},
 			borderRadius: {
