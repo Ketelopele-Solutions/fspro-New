@@ -13,6 +13,7 @@ import { PaymentOverview } from "@/components/payments/PaymentOverview";
 import { PaymentHistory } from "@/components/payments/PaymentHistory";
 import { ArchivedPayments } from "@/components/payments/ArchivedPayments";
 import { PaymentForm } from "@/components/payments/PaymentForm";
+import { EditMemberModal } from "@/components/members/EditMemberModal";
 
 export default function MemberDetails() {
   const { policyNo } = useParams();
@@ -21,6 +22,9 @@ export default function MemberDetails() {
   const [confirmPromoteOpen, setConfirmPromoteOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [paymentFormOpen, setPaymentFormOpen] = useState(false);
+  const [editMemberOpen, setEditMemberOpen] = useState(false);
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const [archiveSuccessOpen, setArchiveSuccessOpen] = useState(false);
 
   // Mock member data - in real app this would come from API
   const member = {
@@ -89,11 +93,19 @@ export default function MemberDetails() {
               Promote to Account Holder
             </TabsTrigger>
           )}
-          <TabsTrigger value="edit" className="gap-2">
+          <TabsTrigger 
+            value="edit" 
+            className="gap-2"
+            onClick={() => setEditMemberOpen(true)}
+          >
             <Edit className="h-4 w-4" />
             Edit
           </TabsTrigger>
-          <TabsTrigger value="archive" className="gap-2">
+          <TabsTrigger 
+            value="archive" 
+            className="gap-2"
+            onClick={() => setArchiveConfirmOpen(true)}
+          >
             <Archive className="h-4 w-4" />
             Archive
           </TabsTrigger>
@@ -203,11 +215,19 @@ export default function MemberDetails() {
           </Tabs>
         </TabsContent>
 
-        <TabsContent value="dependents">
+        <TabsContent 
+          value="dependents"
+          onClick={() => navigate(`/members/${policyNo}/dependents`)}
+        >
           <Card>
             <CardContent className="p-6">
-              <div className="text-center text-muted-foreground">
-                No dependents data available for this member.
+              <div className="text-center">
+                <Button 
+                  onClick={() => navigate(`/members/${policyNo}/dependents`)}
+                  className="bg-slate-600 hover:bg-slate-700 text-white"
+                >
+                  View Dependents Management
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -307,6 +327,66 @@ export default function MemberDetails() {
               </p>
             </div>
             <Button onClick={() => setSuccessModalOpen(false)}>OK</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Member Modal */}
+      <EditMemberModal
+        isOpen={editMemberOpen}
+        onClose={() => setEditMemberOpen(false)}
+        member={member}
+      />
+
+      {/* Archive Confirmation Modal */}
+      <Dialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <DialogContent className="max-w-md">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center">
+                <span className="text-2xl text-orange-600">!</span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Archive Member?</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Are you sure you want to archive this member? You can restore them later from the archives.
+              </p>
+            </div>
+            <div className="flex justify-center gap-2">
+              <Button 
+                onClick={() => {
+                  setArchiveConfirmOpen(false);
+                  setArchiveSuccessOpen(true);
+                }}
+                className="bg-slate-600 hover:bg-slate-700 text-white"
+              >
+                Yes, archive
+              </Button>
+              <Button variant="outline" onClick={() => setArchiveConfirmOpen(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Archive Success Modal */}
+      <Dialog open={archiveSuccessOpen} onOpenChange={setArchiveSuccessOpen}>
+        <DialogContent className="max-w-md">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center">
+              <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
+                <span className="text-2xl text-green-600">✓</span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">Success</h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Member has been successfully archived.
+              </p>
+            </div>
+            <Button onClick={() => setArchiveSuccessOpen(false)}>OK</Button>
           </div>
         </DialogContent>
       </Dialog>

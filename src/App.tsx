@@ -7,6 +7,8 @@ import { Layout } from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Members from "./pages/Members";
 import MemberDetails from "./pages/MemberDetails";
+import Dependents from "./pages/Dependents";
+import ArchivedDependents from "./pages/ArchivedDependents";
 import FieldAgents from "./pages/FieldAgents";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +25,8 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/members" element={<Members />} />
             <Route path="/members/:policyNo" element={<MemberDetails />} />
+            <Route path="/members/:policyNo/dependents" element={<Dependents />} />
+            <Route path="/members/:policyNo/dependents/archived" element={<ArchivedDependents />} />
             <Route path="/field-agents" element={<FieldAgents />} />
             <Route path="/archives" element={<div>Archives Page</div>} />
             <Route path="/account-holders" element={<div>Account Holders Page</div>} />
