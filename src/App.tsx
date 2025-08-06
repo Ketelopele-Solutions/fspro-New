@@ -15,6 +15,8 @@ import ArchivedMemberDetails from "./pages/ArchivedMemberDetails";
 import AccountHolders from "./pages/AccountHolders";
 import PaymentsHistory from "./pages/PaymentsHistory";
 import NotFound from "./pages/NotFound";
+import FuneralPlans from "./pages/FuneralPlans";
+import PlanDetails from "./pages/PlanDetails";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +37,8 @@ const App = () => (
             <Route path="/archives" element={<Archives />} />
             <Route path="/archives/members/:policyNo" element={<ArchivedMemberDetails />} />
             <Route path="/account-holders" element={<AccountHolders />} />
-            <Route path="/funeral-plans" element={<div>Funeral Plans Page</div>} />
+            <Route path="/funeral-plans" element={<FuneralPlans />} />
+            <Route path="/funeral-plans/:planId" element={<PlanDetails />} />
             <Route path="/payments" element={<PaymentsHistory />} />
             <Route path="/analytics" element={<div>Analytics Page</div>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
