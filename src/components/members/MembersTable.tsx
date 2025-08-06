@@ -199,7 +199,7 @@ export const MembersTable = forwardRef<{ refreshMembers: () => void }>((props, r
           <Button variant="outline" size="sm">5</Button>
           <Button variant="outline" size="sm">Next</Button>
         </div>
-        <Button variant="link" className="text-primary">Show All Columns</Button>
+        <Button variant="link" className="text-gray-600">Show All Columns</Button>
       </div>
     </div>
   );

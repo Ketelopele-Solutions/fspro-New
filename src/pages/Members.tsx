@@ -27,7 +27,7 @@ export default function Members() {
 
       <div className="flex gap-4">
         <Button 
-          className="gap-2 bg-blue-600 hover:bg-blue-700"
+          className="gap-2 bg-gray-800 hover:bg-gray-900"
           onClick={() => navigate("/members")}
         >
           <Users className="h-4 w-4" />

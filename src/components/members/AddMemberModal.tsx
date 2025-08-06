@@ -302,9 +302,9 @@ export function AddMemberModal({ open, onOpenChange, onMemberAdded }: AddMemberM
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             CANCEL
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSave} disabled={isLoading}>
-            {isLoading ? "SAVING..." : "SAVE"}
-          </Button>
+                <Button className="bg-gray-800 hover:bg-gray-900" onClick={handleSave} disabled={isLoading}>
+        {isLoading ? "SAVING..." : "SAVE"}
+      </Button>
         </div>
       </DialogContent>
     </Dialog>
