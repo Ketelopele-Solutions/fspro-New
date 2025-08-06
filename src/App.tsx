@@ -10,6 +10,8 @@ import MemberDetails from "./pages/MemberDetails";
 import Dependents from "./pages/Dependents";
 import ArchivedDependents from "./pages/ArchivedDependents";
 import FieldAgents from "./pages/FieldAgents";
+import Archives from "./pages/Archives";
+import ArchivedMemberDetails from "./pages/ArchivedMemberDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,7 +30,8 @@ const App = () => (
             <Route path="/members/:policyNo/dependents" element={<Dependents />} />
             <Route path="/members/:policyNo/dependents/archived" element={<ArchivedDependents />} />
             <Route path="/field-agents" element={<FieldAgents />} />
-            <Route path="/archives" element={<div>Archives Page</div>} />
+            <Route path="/archives" element={<Archives />} />
+            <Route path="/archives/members/:policyNo" element={<ArchivedMemberDetails />} />
             <Route path="/account-holders" element={<div>Account Holders Page</div>} />
             <Route path="/funeral-plans" element={<div>Funeral Plans Page</div>} />
             <Route path="/payments" element={<div>Payments History Page</div>} />
