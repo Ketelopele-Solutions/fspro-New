@@ -32,7 +32,11 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Set up environment variables.
+cp env.example .env.local
+# Edit .env.local with your actual Supabase credentials
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -50,6 +54,26 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## Environment Variables
+
+This project uses environment variables for configuration. Copy the `env.example` file to `.env.local` and update it with your actual values:
+
+```bash
+cp env.example .env.local
+```
+
+### Required Environment Variables
+
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Your Supabase anonymous/public key
+
+### Optional Environment Variables
+
+- `VITE_APP_NAME` - Application name (default: "Hearth Guardian")
+- `VITE_APP_VERSION` - Application version
+- `VITE_APP_ENV` - Environment (development/production)
+- `VITE_ENABLE_DEBUG_MODE` - Enable debug mode (true/false)
+
 ## What technologies are used for this project?
 
 This project is built with:
@@ -59,6 +83,7 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (Backend as a Service)
 
 ## How can I deploy this project?
 

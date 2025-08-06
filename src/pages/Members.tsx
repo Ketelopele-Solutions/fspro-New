@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, UserPlus, Users } from "lucide-react";
+import { ArrowLeft, UserPlus, Users, User } from "lucide-react";
 import { MembersTable } from "@/components/members/MembersTable";
 import { AddMemberModal } from "@/components/members/AddMemberModal";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 export default function Members() {
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const navigate = useNavigate();
+  const membersTableRef = useRef<{ refreshMembers: () => void }>(null);
 
   return (
     <div className="space-y-6">
@@ -25,36 +25,41 @@ export default function Members() {
         <h1 className="text-3xl font-semibold">Members</h1>
       </div>
 
-      <Tabs defaultValue="view-all" className="space-y-6">
-        <TabsList className="grid w-fit grid-cols-3">
-          <TabsTrigger value="view-all" className="gap-2">
-            <Users className="h-4 w-4" />
-            View All Members
-          </TabsTrigger>
-          <TabsTrigger 
-            value="add-member" 
-            className="gap-2"
-            onClick={() => setAddMemberOpen(true)}
-          >
-            <UserPlus className="h-4 w-4" />
-            Add Member
-          </TabsTrigger>
-          <TabsTrigger 
-            value="field-agents" 
-            className="gap-2"
-            onClick={() => navigate("/field-agents")}
-          >
-            <Users className="h-4 w-4" />
-            Field Agents
-          </TabsTrigger>
-        </TabsList>
+      <div className="flex gap-4">
+        <Button 
+          className="gap-2 bg-blue-600 hover:bg-blue-700"
+          onClick={() => navigate("/members")}
+        >
+          <Users className="h-4 w-4" />
+          View All Members
+        </Button>
+        <Button 
+          variant="outline"
+          className="gap-2"
+          onClick={() => setAddMemberOpen(true)}
+        >
+          <UserPlus className="h-4 w-4" />
+          Add Member
+        </Button>
+        <Button 
+          variant="outline"
+          className="gap-2"
+          onClick={() => navigate("/field-agents")}
+        >
+          <User className="h-4 w-4" />
+          Field Agents
+        </Button>
+      </div>
 
-        <TabsContent value="view-all" className="space-y-4">
-          <MembersTable />
-        </TabsContent>
-      </Tabs>
+      <MembersTable ref={membersTableRef} />
 
-      <AddMemberModal open={addMemberOpen} onOpenChange={setAddMemberOpen} />
+      <AddMemberModal 
+        open={addMemberOpen} 
+        onOpenChange={setAddMemberOpen}
+        onMemberAdded={() => {
+          membersTableRef.current?.refreshMembers();
+        }}
+      />
     </div>
   );
 }

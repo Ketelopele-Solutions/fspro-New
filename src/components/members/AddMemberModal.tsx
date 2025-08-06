@@ -6,13 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { UserPlus } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddMemberModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onMemberAdded?: () => void;
 }
 
-export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
+export function AddMemberModal({ open, onOpenChange, onMemberAdded }: AddMemberModalProps) {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     funeralPlan: "",
     premium: "0.00",
@@ -26,15 +31,96 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
     branch: "",
     phoneNumber: "",
     telHome: "",
-    captureDate: "",
-    dateJoined: "",
+    captureDate: new Date().toISOString().split('T')[0],
+    dateJoined: new Date().toISOString().split('T')[0],
     fieldAgent: ""
   });
 
-  const handleSave = () => {
-    // Handle saving the member data
-    console.log("Saving member:", formData);
-    onOpenChange(false);
+  const handleSave = async () => {
+    if (!formData.firstName || !formData.surname || !formData.idNumber) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields (First Name, Surname, ID Number)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+             // Generate a unique policy number
+       const currentDate = new Date();
+       const year = currentDate.getFullYear().toString().slice(-2);
+       const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+       const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+       const policyNumber = `${year}${month}${randomNum}`;
+
+       const { data, error } = await supabase
+         .from('members')
+         .insert([
+           {
+             policyno: policyNumber,
+             firstname: formData.firstName,
+             surname: formData.surname,
+             id: formData.idNumber,
+             birthdate: formData.birthDate,
+             gender: formData.gender,
+             title: formData.title,
+             address: formData.address,
+             branch: formData.branch,
+             mobile: formData.phoneNumber,
+             telh: formData.telHome,
+             capture_date: formData.captureDate,
+             datejoined: formData.dateJoined,
+             premium: parseFloat(formData.premium) || 0,
+             activedate: new Date().toISOString().split('T')[0],
+             created_by: 'system',
+             is_archived: false
+           }
+         ])
+         .select();
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Member added successfully!",
+      });
+
+      // Reset form
+      setFormData({
+        funeralPlan: "",
+        premium: "0.00",
+        firstName: "",
+        surname: "",
+        idNumber: "",
+        birthDate: "",
+        gender: "",
+        title: "",
+        address: "",
+        branch: "",
+        phoneNumber: "",
+        telHome: "",
+        captureDate: new Date().toISOString().split('T')[0],
+        dateJoined: new Date().toISOString().split('T')[0],
+        fieldAgent: ""
+      });
+
+      onOpenChange(false);
+      onMemberAdded?.();
+         } catch (error) {
+       console.error('Error adding member:', error);
+       console.error('Error details:', JSON.stringify(error, null, 2));
+       toast({
+         title: "Error",
+         description: `Failed to add member: ${error.message || 'Unknown error'}`,
+         variant: "destructive",
+       });
+     } finally {
+       setIsLoading(false);
+     }
   };
 
   return (
@@ -102,7 +188,7 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
             <Label htmlFor="birthDate">BIRTH DATE:</Label>
             <Input
               id="birthDate"
-              type="date"
+              placeholder="yyyy/mm/dd"
               value={formData.birthDate}
               onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
             />
@@ -183,7 +269,6 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
             <Label htmlFor="captureDate">CAPTURE DATE:</Label>
             <Input
               id="captureDate"
-              type="date"
               value={formData.captureDate}
               onChange={(e) => setFormData({...formData, captureDate: e.target.value})}
             />
@@ -193,7 +278,6 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
             <Label htmlFor="dateJoined">DATE JOINED:</Label>
             <Input
               id="dateJoined"
-              type="date"
               value={formData.dateJoined}
               onChange={(e) => setFormData({...formData, dateJoined: e.target.value})}
             />
@@ -218,8 +302,8 @@ export function AddMemberModal({ open, onOpenChange }: AddMemberModalProps) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             CANCEL
           </Button>
-          <Button onClick={handleSave}>
-            SAVE
+          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSave} disabled={isLoading}>
+            {isLoading ? "SAVING..." : "SAVE"}
           </Button>
         </div>
       </DialogContent>

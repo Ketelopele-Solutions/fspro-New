@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,80 +7,92 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const members = [
-  {
-    policyNo: "789020",
-    fullName: "MANTILETSANE MOLAHLEHI",
-    id: "4204080417086",
-    premium: "R470.00",
-    plan: "BLACK PLAN FAM 66-75 (30K)",
-    mobile: "0655302214",
-    status: "ACTIVE"
-  },
-  {
-    policyNo: "789023",
-    fullName: "KHEHLA ALFRED RADEBE",
-    id: "4205055269089",
-    premium: "R180.00", 
-    plan: "KGOMO PLAN 14-18-100 (10K) K10",
-    mobile: "0725953564",
-    status: "ACTIVE"
-  },
-  {
-    policyNo: "25040002",
-    fullName: "nomhle mbiba",
-    id: "0202141057097",
-    premium: "R0.00",
-    plan: "No Plan",
-    mobile: "0655302219",
-    status: "WAITING PERIOD"
-  },
-  {
-    policyNo: "25070003",
-    fullName: "Bhilili Mtebele",
-    id: "0202145678975",
-    premium: "R470.00",
-    plan: "BLACK PLAN FAM 66-75 (30K)",
-    mobile: "0835740057",
-    status: "ACTIVE"
-  },
-  {
-    policyNo: "25070008",
-    fullName: "TEBOHO JOHANNES SEKHOSANA",
-    id: "8908065883080",
-    premium: "R280.00",
-    plan: "BLACK PLAN FAM 18-65 (30K)",
-    mobile: "0655302219",
-    status: "WAITING PERIOD"
-  }
-];
+interface Member {
+  id: string;
+  policyno: string;
+  firstname: string;
+  surname: string;
+  id: string;
+  premium: number;
+  mobile: string;
+  activedate: string;
+  is_archived: boolean;
+  created_at: string;
+}
 
-export function MembersTable() {
+export const MembersTable = forwardRef<{ refreshMembers: () => void }>((props, ref) => {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("5");
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchMembers();
+  }, []);
+
+  const fetchMembers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .eq('is_archived', false)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        throw error;
+      }
+
+      setMembers(data || []);
+    } catch (error) {
+      console.error('Error fetching members:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      toast({
+        title: "Error",
+        description: `Failed to load members: ${error.message || 'Unknown error'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredMembers = members.filter(member =>
-    member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.policyNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    `${member.firstname} ${member.surname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    member.policyno.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.id.includes(searchTerm)
   );
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return <Badge className="bg-status-active text-status-active-foreground">ACTIVE</Badge>;
-      case "WAITING PERIOD":
-        return <Badge className="bg-status-waiting text-status-waiting-foreground">WAITING PERIOD</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+  const getStatusBadge = (member: Member) => {
+    // Check if member has an active date and is not archived
+    if (member.activedate && !member.is_archived) {
+      return (
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+          <Badge className="bg-green-100 text-green-800 border-green-200">ACTIVE</Badge>
+        </div>
+      );
+    } else {
+      return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">WAITING PERIOD</Badge>;
     }
   };
 
   const handleViewDetails = (policyNo: string) => {
     navigate(`/members/${policyNo}`);
   };
+
+  // Expose refresh function to parent component
+  const refreshMembers = () => {
+    fetchMembers();
+  };
+
+  useImperativeHandle(ref, () => ({
+    refreshMembers
+  }));
 
   return (
     <div className="space-y-4">
@@ -129,32 +141,46 @@ export function MembersTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredMembers.slice(0, parseInt(entriesPerPage)).map((member) => (
-              <TableRow key={member.policyNo}>
-                <TableCell className="font-medium">{member.policyNo}</TableCell>
-                <TableCell>{member.fullName}</TableCell>
-                <TableCell>{member.id}</TableCell>
-                <TableCell>{member.premium}</TableCell>
-                <TableCell>{member.plan}</TableCell>
-                <TableCell>{member.mobile}</TableCell>
-                <TableCell>{getStatusBadge(member.status)}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleViewDetails(member.policyNo)}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Member Details
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  Loading members...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : filteredMembers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  No members found
+                </TableCell>
+              </TableRow>
+            ) : (
+                             filteredMembers.slice(0, parseInt(entriesPerPage)).map((member) => (
+                 <TableRow key={member.id}>
+                   <TableCell className="font-medium">{member.policyno}</TableCell>
+                   <TableCell>{`${member.firstname} ${member.surname}`}</TableCell>
+                   <TableCell>{member.id}</TableCell>
+                   <TableCell>R{member.premium.toLocaleString()}</TableCell>
+                   <TableCell>{"No Plan"}</TableCell>
+                   <TableCell>{member.mobile}</TableCell>
+                   <TableCell>{getStatusBadge(member)}</TableCell>
+                   <TableCell>
+                     <DropdownMenu>
+                       <DropdownMenuTrigger asChild>
+                         <Button variant="ghost" size="icon">
+                           <MoreHorizontal className="h-4 w-4" />
+                         </Button>
+                       </DropdownMenuTrigger>
+                       <DropdownMenuContent align="end">
+                         <DropdownMenuItem onClick={() => handleViewDetails(member.policyno)}>
+                           <Eye className="h-4 w-4 mr-2" />
+                           Member Details
+                         </DropdownMenuItem>
+                       </DropdownMenuContent>
+                     </DropdownMenu>
+                   </TableCell>
+                 </TableRow>
+               ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -162,7 +188,7 @@ export function MembersTable() {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Showing page 1 of 7
+          Showing page 1 of 5
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" disabled>Previous</Button>
@@ -171,12 +197,10 @@ export function MembersTable() {
           <Button variant="outline" size="sm">3</Button>
           <Button variant="outline" size="sm">4</Button>
           <Button variant="outline" size="sm">5</Button>
-          <Button variant="outline" size="sm">6</Button>
-          <Button variant="outline" size="sm">7</Button>
           <Button variant="outline" size="sm">Next</Button>
         </div>
         <Button variant="link" className="text-primary">Show All Columns</Button>
       </div>
     </div>
   );
-}
+});
