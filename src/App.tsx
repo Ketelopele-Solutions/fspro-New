@@ -12,6 +12,8 @@ import ArchivedDependents from "./pages/ArchivedDependents";
 import FieldAgents from "./pages/FieldAgents";
 import Archives from "./pages/Archives";
 import ArchivedMemberDetails from "./pages/ArchivedMemberDetails";
+import AccountHolders from "./pages/AccountHolders";
+import PaymentsHistory from "./pages/PaymentsHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,9 +34,9 @@ const App = () => (
             <Route path="/field-agents" element={<FieldAgents />} />
             <Route path="/archives" element={<Archives />} />
             <Route path="/archives/members/:policyNo" element={<ArchivedMemberDetails />} />
-            <Route path="/account-holders" element={<div>Account Holders Page</div>} />
+            <Route path="/account-holders" element={<AccountHolders />} />
             <Route path="/funeral-plans" element={<div>Funeral Plans Page</div>} />
-            <Route path="/payments" element={<div>Payments History Page</div>} />
+            <Route path="/payments" element={<PaymentsHistory />} />
             <Route path="/analytics" element={<div>Analytics Page</div>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
